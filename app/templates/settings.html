@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Settings – Todo Sync GW{% endblock %}
+
+{% block content %}
+<h1>Settings</h1>
+
+{% for s in settings %}
+<section class="service-card">
+  <h2>{{ s.service | replace('_', ' ') | title }}</h2>
+  <form method="post" action="{{ url_for('ui.update_settings', service=s.service) }}">
+    <label>
+      <input type="checkbox" name="enabled" {% if s.enabled %}checked{% endif %}>
+      Enable sync
+    </label>
+    <br>
+    <label>
+      Sync interval (minutes)
+      <input type="number" name="sync_interval_minutes" value="{{ s.sync_interval_minutes }}" min="1">
+    </label>
+    <br>
+    <label>
+      Project / list filter
+      <input type="text" name="project_filter" value="{{ s.project_filter or '' }}"
+             placeholder="Leave blank for all">
+    </label>
+    <br>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('ui.auth', service=s.service) }}" class="btn btn-secondary">Credentials</a>
+  </form>
+  {% if s.last_synced_at is not none %}
+  <p class="hint">Last synced: {{ s.last_synced_at.strftime('%Y-%m-%d %H:%M') }}</p>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

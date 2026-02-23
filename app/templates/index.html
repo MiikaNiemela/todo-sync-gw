@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Tasks – Todo Sync GW{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Synced Tasks</h1>
+  <form method="post" action="{{ url_for('api.trigger_sync') }}" style="display:inline">
+    <button type="submit" class="btn btn-primary">Sync Now</button>
+  </form>
+</div>
+
+<table class="task-table">
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Title</th>
+      <th>Priority</th>
+      <th>Due</th>
+      <th>Status</th>
+      <th>Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr class="{{ 'completed' if task.completed else '' }}">
+      <td><span class="badge badge-{{ task.source_service }}">{{ task.source_service }}</span></td>
+      <td>{{ task.title }}</td>
+      <td>{{ task.priority }}</td>
+      <td>{{ task.due_date.strftime('%Y-%m-%d') if task.due_date is not none else '–' }}</td>
+      <td>{{ 'Done' if task.completed else 'Open' }}</td>
+      <td>{{ task.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty">No tasks yet. Configure a service and hit Sync Now.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="service-status">
+  <h2>Service Status</h2>
+  <ul>
+    {% for name, s in settings.items() %}
+    <li>
+      <strong>{{ name }}</strong>
+      – {% if s.enabled %}enabled{% else %}disabled{% endif %}
+      {% if s.last_synced_at %} – last synced {{ s.last_synced_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
+      <a href="{{ url_for('ui.auth', service=name) }}" class="btn btn-sm">Configure</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
