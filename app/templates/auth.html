@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ service | replace('_', ' ') | title }} Auth – Todo Sync GW{% endblock %}
+
+{% block content %}
+<h1>{{ service | replace('_', ' ') | title }} – Credentials</h1>
+
+<form method="post" action="{{ url_for('ui.save_auth', service=service) }}">
+  <label>
+    API Key / Access Token
+    <input type="password" name="api_key"
+           value="{{ credential.api_key if credential else '' }}"
+           placeholder="Paste your API key here"
+           autocomplete="off">
+  </label>
+  <br>
+
+  {% if service == 'habitica' %}
+  <label>
+    Habitica User ID
+    <input type="text" name="user_id"
+           value="{{ credential.user_id if credential else '' }}"
+           placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+  </label>
+  <br>
+  {% endif %}
+
+  <button type="submit" class="btn btn-primary">Save credentials</button>
+  <a href="{{ url_for('ui.settings') }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<div class="help-box">
+  {% if service == 'todoist' %}
+  <p>Find your API token in <a href="https://app.todoist.com/app/settings/integrations/developer"
+     target="_blank" rel="noopener">Todoist → Settings → Integrations → Developer</a>.</p>
+  {% elif service == 'habitica' %}
+  <p>Find your User ID and API Token in <a href="https://habitica.com/user/settings/api"
+     target="_blank" rel="noopener">Habitica → User Settings → API</a>.</p>
+  {% elif service == 'google_tasks' %}
+  <p>Provide an OAuth 2.0 access token for the Google Tasks API scope
+     (<code>https://www.googleapis.com/auth/tasks</code>).</p>
+  {% endif %}
+</div>
+{% endblock %}
